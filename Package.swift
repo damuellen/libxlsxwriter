@@ -3,6 +3,12 @@
 
 import PackageDescription
 
+#if os(Windows)
+let library = "Zlib"
+#else
+let library = "z"
+#endif
+
 let package = Package(
     name: "libxlsxwriter",
     products: [
@@ -26,8 +32,13 @@ let package = Package(
                 "third_party/md5/md5.c"
             ],
             publicHeadersPath: "include",
+            cSettings: [
+                .define("_CRT_DEPRECATE_TEXT", .when(platforms: [.windows])),
+                .define("_CRT_SECURE_NO_DEPRECATE", .when(platforms: [.windows])),
+                .define("_CRT_SECURE_NO_WARNINGS", .when(platforms: [.windows])),
+            ],
             linkerSettings: [
-                .linkedLibrary("z")
+                .linkedLibrary(library)
             ]),
         .testTarget(
             name: "libxlsxwritertests",
@@ -35,7 +46,7 @@ let package = Package(
             path: ".",
             sources: ["test/swift"],
             linkerSettings: [
-                .linkedLibrary("z")
+                .linkedLibrary(library)
             ]
         )
     ]
